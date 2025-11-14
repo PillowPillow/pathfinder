@@ -46,7 +46,7 @@
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
 - [ ] T011 Create SQLite connection setup in src/infrastructure/database/sqlite.ts
-- [ ] T012 Create initial schema migration in src/infrastructure/database/migrations/001_initial_schema.sql
+- [ ] T012 Create initial schema migration in src/infrastructure/database/migrations/001_initial_schema.sql (include Character.status enum: living/deceased/retired)
 - [ ] T013 [P] Create User entity in src/domain/entities/User.ts
 - [ ] T014 [P] Create Campaign entity in src/domain/entities/Campaign.ts
 - [ ] T015 [P] Create Invitation entity in src/domain/entities/Invitation.ts
@@ -69,7 +69,8 @@
 - [ ] T032 Create Socket.IO event type definitions in src/infrastructure/socket/events.ts
 - [ ] T033 Create Socket.IO server setup in src/infrastructure/socket/server.ts
 - [ ] T034 [P] Create base Layout component in src/components/layout/Layout.tsx
-- [ ] T035 [P] Create Header component in src/components/layout/Header.tsx
+- [ ] T035 [P] Create Header component with navigation links (Campaigns, Characters, Profile/Logout) in src/components/layout/Header.tsx
+- [ ] T035a [P] Create Breadcrumb component in src/components/layout/Breadcrumb.tsx
 - [ ] T036 [P] Create common Button component in src/components/common/Button.tsx
 - [ ] T037 [P] Create common Input component in src/components/common/Input.tsx
 - [ ] T038 [P] Create common Notification component in src/components/common/Notification.tsx
@@ -97,20 +98,24 @@
 - [ ] T045 [P] [US1] Contract test for POST /api/campaigns/create in tests/contract/api/campaigns.test.ts
 - [ ] T046 [P] [US1] Contract test for POST /api/campaigns/invite in tests/contract/api/campaigns.test.ts
 - [ ] T047 [P] [US1] Contract test for GET /api/campaigns/[id] in tests/contract/api/campaigns.test.ts
+- [ ] T047a [P] [US1] Contract test for DELETE /api/campaigns/invite/:token (revoke invitation) in tests/contract/api/campaigns.test.ts
 - [ ] T048 [P] [US1] Integration test for campaign creation workflow in tests/integration/campaignCreation.test.ts
 - [ ] T049 [P] [US1] Integration test for player invitation workflow in tests/integration/playerInvitation.test.ts
+- [ ] T049a [P] [US1] Integration test for invitation revocation workflow in tests/integration/invitationRevocation.test.ts
 
 ### Implementation for User Story 1
 
 - [ ] T050 [US1] Create CreateCampaign use case in src/application/useCases/CreateCampaign.ts
 - [ ] T051 [US1] Create GenerateInvitation use case in src/application/useCases/GenerateInvitation.ts
 - [ ] T052 [US1] Create JoinCampaign use case in src/application/useCases/JoinCampaign.ts
+- [ ] T052a [US1] Create RevokeInvitation use case in src/application/useCases/RevokeInvitation.ts
 - [ ] T053 [P] [US1] Create DTO types in src/application/dto/index.ts
-- [ ] T054 [P] [US1] Implement POST /api/auth/register in pages/api/auth/register.ts
+- [ ] T054 [P] [US1] Implement POST /api/auth/register with email validation and password length validation (min 8 chars) in pages/api/auth/register.ts
 - [ ] T055 [P] [US1] Implement POST /api/auth/login in pages/api/auth/login.ts
 - [ ] T056 [P] [US1] Implement GET /api/auth/session in pages/api/auth/session.ts
 - [ ] T057 [P] [US1] Implement POST /api/campaigns/create in pages/api/campaigns/create.ts
 - [ ] T058 [P] [US1] Implement POST /api/campaigns/invite in pages/api/campaigns/invite.ts
+- [ ] T058a [P] [US1] Implement DELETE /api/campaigns/invite/[token] (revoke invitation) in pages/api/campaigns/invite/[token].ts
 - [ ] T059 [P] [US1] Implement GET /api/campaigns/[id] in pages/api/campaigns/[id].ts
 - [ ] T060 [P] [US1] Create registration page in pages/register.tsx
 - [ ] T061 [P] [US1] Create login page in pages/login.tsx
@@ -119,6 +124,7 @@
 - [ ] T064 [P] [US1] Create invitation landing page in pages/campaigns/invite/[token].tsx
 - [ ] T065 [P] [US1] Create CampaignCard component in src/components/campaign/CampaignCard.tsx
 - [ ] T066 [P] [US1] Create InviteLink component in src/components/campaign/InviteLink.tsx
+- [ ] T066a [P] [US1] Add invitation revocation control to InviteLink component (revoke button for GM)
 - [ ] T067 [US1] Add validation and error handling for campaign operations
 - [ ] T068 [US1] Add logging for campaign and authentication operations
 
@@ -138,26 +144,31 @@
 - [ ] T070 [P] [US2] Unit test for CharacterValidator.validateAbilityScore in tests/unit/domain/CharacterValidator.test.ts
 - [ ] T071 [P] [US2] Unit test for CharacterValidator.validateCharacterName in tests/unit/domain/CharacterValidator.test.ts
 - [ ] T072 [P] [US2] Unit test for CampaignRules.enforceOneLivingCharacter in tests/unit/domain/CampaignRules.test.ts
+- [ ] T072a [P] [US2] Unit test for character status transitions (living/deceased/retired) in tests/unit/domain/Character.test.ts
 - [ ] T073 [P] [US2] Contract test for POST /api/characters/create in tests/contract/api/characters.test.ts
 - [ ] T074 [P] [US2] Contract test for GET /api/characters/[id] in tests/contract/api/characters.test.ts
 - [ ] T075 [P] [US2] Contract test for PUT /api/characters/[id] in tests/contract/api/characters.test.ts
 - [ ] T076 [P] [US2] Integration test for character creation workflow in tests/integration/characterCreation.test.ts
 - [ ] T077 [P] [US2] Integration test for one-living-character enforcement in tests/integration/characterRules.test.ts
+- [ ] T077a [P] [US2] Integration test for character death/retirement workflow in tests/integration/characterStatus.test.ts
 
 ### Implementation for User Story 2
 
 - [ ] T078 [US2] Create CreateCharacter use case in src/application/useCases/CreateCharacter.ts
 - [ ] T079 [US2] Create UpdateCharacter use case in src/application/useCases/UpdateCharacter.ts
+- [ ] T079a [US2] Create ChangeCharacterStatus use case in src/application/useCases/ChangeCharacterStatus.ts
 - [ ] T080 [P] [US2] Implement POST /api/characters/create in pages/api/characters/create.ts
 - [ ] T081 [P] [US2] Implement GET /api/characters/[id] in pages/api/characters/[id].ts (read character)
 - [ ] T082 [P] [US2] Implement PUT /api/characters/[id] in pages/api/characters/[id].ts (update character)
+- [ ] T082a [P] [US2] Implement PATCH /api/characters/[id]/status (GM only - change character status) in pages/api/characters/[id]/status.ts
 - [ ] T083 [P] [US2] Create character creation page in pages/characters/create.tsx
 - [ ] T084 [P] [US2] Create character sheet view/edit page in pages/characters/[id].tsx
 - [ ] T085 [P] [US2] Create CharacterSheet component in src/components/character/CharacterSheet.tsx
-- [ ] T086 [P] [US2] Create AbilityScoreField component in src/components/character/AbilityScoreField.tsx
+- [ ] T086 [P] [US2] Create AbilityScoreField component with French labels (Force, Dextérité, Constitution, Intelligence, Sagesse, Charisme) in src/components/character/AbilityScoreField.tsx
 - [ ] T087 [P] [US2] Create CharacterSummary component in src/components/character/CharacterSummary.tsx
+- [ ] T087a [P] [US2] Create CharacterStatusControl component (GM only - dropdown to change status) in src/components/character/CharacterStatusControl.tsx
 - [ ] T088 [US2] Add client-side validation for ability scores (1-30 range)
-- [ ] T089 [US2] Add one-living-character rule enforcement in character creation
+- [ ] T089 [US2] Add one-living-character rule enforcement in character creation (check for living characters only)
 - [ ] T090 [US2] Display ability modifiers with scores (e.g., "14 (+2)")
 
 **Checkpoint**: At this point, User Story 2 should work - players can create and edit characters with automatic modifier calculations
@@ -173,8 +184,10 @@
 ### Tests for User Story 3 (TDD MANDATORY)
 
 - [ ] T091 [P] [US3] Contract test for GET /api/campaigns/[id]/party in tests/contract/api/campaigns.test.ts
+- [ ] T091a [P] [US3] Contract test for GET /api/characters/[id]/activity (audit trail) in tests/contract/api/characters.test.ts
 - [ ] T092 [P] [US3] Integration test for GM oversight workflow in tests/integration/gmOversight.test.ts
 - [ ] T093 [P] [US3] Integration test for GM character editing in tests/integration/gmCharacterEdit.test.ts
+- [ ] T093a [P] [US3] Integration test for activity logging in tests/integration/activityLog.test.ts
 
 ### Implementation for User Story 3
 
@@ -185,7 +198,10 @@
 - [ ] T098 [US3] Add GM-specific UI for party list view in campaign dashboard
 - [ ] T099 [US3] Implement GM permission checks in character edit API routes
 - [ ] T100 [US3] Add GM override capability in character sheet component
-- [ ] T101 [US3] Add activity logging for GM edits to ActivityLog table
+- [ ] T101 [US3] Add activity logging for all character edits (player and GM) to ActivityLog table
+- [ ] T101a [P] [US3] Implement GET /api/characters/[id]/activity (audit trail) in pages/api/characters/[id]/activity.ts
+- [ ] T101b [P] [US3] Create ActivityLogViewer component for GM audit trail in src/components/character/ActivityLogViewer.tsx
+- [ ] T101c [US3] Integrate ActivityLogViewer into character sheet page (GM view only)
 
 **Checkpoint**: At this point, User Story 3 should work - GMs can view all characters and make edits
 
@@ -213,7 +229,7 @@
 - [ ] T110 [P] [US4] Implement campaign join/leave handlers in src/infrastructure/socket/handlers/campaign.ts
 - [ ] T111 [P] [US4] Implement character update handler in src/infrastructure/socket/handlers/characterUpdate.ts
 - [ ] T112 [P] [US4] Implement sync request handler in src/infrastructure/socket/handlers/sync.ts
-- [ ] T113 [US4] Wire up socket handlers in src/infrastructure/socket/server.ts (setupSocketHandlers)
+- [ ] T113 [US4] Wire up socket handlers in src/infrastructure/socket/server.ts (setupSocketHandlers - runs after T109-T112)
 - [ ] T114 [US4] Implement Socket.IO room management (user rooms, campaign rooms)
 - [ ] T115 [US4] Implement conflict detection using updatedAt timestamps
 - [ ] T116 [US4] Implement last-write-wins conflict resolution
@@ -268,6 +284,7 @@
 - [ ] T140 [P] Add responsive design breakpoints (mobile 320px, tablet 768px, desktop 1024px+)
 - [ ] T141 [P] Add keyboard navigation support for accessibility
 - [ ] T142 [P] Add ARIA labels for screen readers
+- [ ] T142a [P] Verify navigation structure meets FR-034 criteria (3-click rule, breadcrumbs, clear labels)
 - [ ] T143 Code cleanup and refactoring (DRY, SOLID compliance)
 - [ ] T144 Performance optimization (bundle size, lazy loading)
 - [ ] T145 Security hardening (input sanitization, SQL injection prevention)
