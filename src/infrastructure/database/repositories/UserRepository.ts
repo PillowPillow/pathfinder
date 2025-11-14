@@ -1,8 +1,8 @@
-import db from '../sqlite';
-import { User, CreateUserDTO } from '@/domain/entities/User';
+import { db } from '../sqlite';
+import { User, CreateUserDTO } from '../../../domain/entities/User';
 
 export class UserRepository {
-  static create(dto: CreateUserDTO & { passwordHash: string }): User {
+  async create(dto: CreateUserDTO & { passwordHash: string }): Promise<User> {
     const stmt = db.prepare(`
       INSERT INTO users (email, password_hash, display_name)
       VALUES (?, ?, ?)
@@ -13,7 +13,7 @@ export class UserRepository {
     return this.findById(Number(result.lastInsertRowid))!;
   }
 
-  static findById(id: number): User | null {
+  async findById(id: number): Promise<User | null> {
     const stmt = db.prepare(`
       SELECT id, email, password_hash as passwordHash, display_name as displayName, created_at as createdAt
       FROM users
@@ -29,7 +29,7 @@ export class UserRepository {
     };
   }
 
-  static findByEmail(email: string): User | null {
+  async findByEmail(email: string): Promise<User | null> {
     const stmt = db.prepare(`
       SELECT id, email, password_hash as passwordHash, display_name as displayName, created_at as createdAt
       FROM users
@@ -45,7 +45,7 @@ export class UserRepository {
     };
   }
 
-  static update(id: number, updates: Partial<Pick<User, 'displayName' | 'passwordHash'>>): User | null {
+  async update(id: number, updates: Partial<Pick<User, 'displayName' | 'passwordHash'>>): Promise<User | null> {
     const fields: string[] = [];
     const values: any[] = [];
 
