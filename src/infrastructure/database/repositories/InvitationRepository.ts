@@ -1,8 +1,8 @@
-import db from '../sqlite';
-import { Invitation, CreateInvitationDTO } from '@/domain/entities/Invitation';
+import { db } from '../sqlite';
+import { Invitation, CreateInvitationDTO } from '../../../domain/entities/Invitation';
 
 export class InvitationRepository {
-  static create(dto: CreateInvitationDTO): Invitation {
+  async create(dto: CreateInvitationDTO): Promise<Invitation> {
     const stmt = db.prepare(`
       INSERT INTO invitations (token, campaign_id)
       VALUES (?, ?)
@@ -13,7 +13,7 @@ export class InvitationRepository {
     return this.findById(Number(result.lastInsertRowid))!;
   }
 
-  static findByToken(token: string): Invitation | null {
+  async findByToken(token: string): Promise<Invitation | null> {
     const stmt = db.prepare(`
       SELECT id, token, campaign_id as campaignId, created_at as createdAt, revoked_at as revokedAt
       FROM invitations
@@ -27,10 +27,11 @@ export class InvitationRepository {
       ...row,
       createdAt: new Date(row.createdAt),
       revokedAt: row.revokedAt ? new Date(row.revokedAt) : null,
+      revoked: row.revokedAt !== null,
     };
   }
 
-  static findById(id: number): Invitation | null {
+  async findById(id: number): Promise<Invitation | null> {
     const stmt = db.prepare(`
       SELECT id, token, campaign_id as campaignId, created_at as createdAt, revoked_at as revokedAt
       FROM invitations
@@ -44,10 +45,11 @@ export class InvitationRepository {
       ...row,
       createdAt: new Date(row.createdAt),
       revokedAt: row.revokedAt ? new Date(row.revokedAt) : null,
+      revoked: row.revokedAt !== null,
     };
   }
 
-  static revoke(token: string): boolean {
+  async revoke(token: string): Promise<boolean> {
     const stmt = db.prepare(`
       UPDATE invitations
       SET revoked_at = CURRENT_TIMESTAMP
@@ -58,8 +60,8 @@ export class InvitationRepository {
     return result.changes > 0;
   }
 
-  static isValid(token: string): boolean {
-    const invitation = this.findByToken(token);
+  async isValid(token: string): Promise<boolean> {
+    const invitation = await this.findByToken(token);
     return invitation !== null && invitation.revokedAt === null;
   }
 }

@@ -70,7 +70,7 @@
 - [X] T033 Create Socket.IO server setup in src/infrastructure/socket/server.ts
 - [X] T034 [P] Create base Layout component in src/components/layout/Layout.tsx
 - [X] T035 [P] Create Header component with navigation links (Campaigns, Characters, Profile/Logout) in src/components/layout/Header.tsx
-- [ ] T035a [P] Create Breadcrumb component in src/components/layout/Breadcrumb.tsx
+- [X] T035a [P] Create Breadcrumb component in src/components/layout/Breadcrumb.tsx
 - [X] T036 [P] Create common Button component in src/components/common/Button.tsx
 - [X] T037 [P] Create common Input component in src/components/common/Input.tsx
 - [X] T038 [P] Create common Notification component in src/components/common/Notification.tsx
@@ -89,19 +89,19 @@
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T039 [P] [US1] Unit test for password hashing in tests/unit/infrastructure/auth/hash.test.ts
-- [ ] T040 [P] [US1] Unit test for session token generation in tests/unit/infrastructure/auth/session.test.ts
-- [ ] T041 [P] [US1] Unit test for CampaignRules.validateGMPermission in tests/unit/domain/CampaignRules.test.ts
-- [ ] T042 [P] [US1] Contract test for POST /api/auth/register in tests/contract/api/auth.test.ts
-- [ ] T043 [P] [US1] Contract test for POST /api/auth/login in tests/contract/api/auth.test.ts
-- [ ] T044 [P] [US1] Contract test for GET /api/auth/session in tests/contract/api/auth.test.ts
-- [ ] T045 [P] [US1] Contract test for POST /api/campaigns/create in tests/contract/api/campaigns.test.ts
-- [ ] T046 [P] [US1] Contract test for POST /api/campaigns/invite in tests/contract/api/campaigns.test.ts
-- [ ] T047 [P] [US1] Contract test for GET /api/campaigns/[id] in tests/contract/api/campaigns.test.ts
-- [ ] T047a [P] [US1] Contract test for DELETE /api/campaigns/invite/:token (revoke invitation) in tests/contract/api/campaigns.test.ts
-- [ ] T048 [P] [US1] Integration test for campaign creation workflow in tests/integration/campaignCreation.test.ts
-- [ ] T049 [P] [US1] Integration test for player invitation workflow in tests/integration/playerInvitation.test.ts
-- [ ] T049a [P] [US1] Integration test for invitation revocation workflow in tests/integration/invitationRevocation.test.ts
+- [X] T039 [P] [US1] Unit test for password hashing in tests/unit/infrastructure/auth/hash.test.ts
+- [X] T040 [P] [US1] Unit test for session token generation in tests/unit/infrastructure/auth/session.test.ts
+- [X] T041 [P] [US1] Unit test for CampaignRules.validateGMPermission in tests/unit/domain/CampaignRules.test.ts
+- [X] T042 [P] [US1] Contract test for POST /api/auth/register in tests/contract/api/auth.test.ts
+- [X] T043 [P] [US1] Contract test for POST /api/auth/login in tests/contract/api/auth.test.ts
+- [X] T044 [P] [US1] Contract test for GET /api/auth/session in tests/contract/api/auth.test.ts
+- [X] T045 [P] [US1] Contract test for POST /api/campaigns/create in tests/contract/api/campaigns.test.ts
+- [X] T046 [P] [US1] Contract test for POST /api/campaigns/invite in tests/contract/api/campaigns.test.ts
+- [X] T047 [P] [US1] Contract test for GET /api/campaigns/[id] in tests/contract/api/campaigns.test.ts
+- [X] T047a [P] [US1] Contract test for DELETE /api/campaigns/invite/:token (revoke invitation) in tests/contract/api/campaigns.test.ts
+- [X] T048 [P] [US1] Integration test for campaign creation workflow in tests/integration/campaignCreation.test.ts
+- [X] T049 [P] [US1] Integration test for player invitation workflow in tests/integration/playerInvitation.test.ts
+- [X] T049a [P] [US1] Integration test for invitation revocation workflow in tests/integration/invitationRevocation.test.ts
 
 ### Implementation for User Story 1
 

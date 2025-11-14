@@ -4,6 +4,7 @@ export interface Invitation {
   campaignId: number;
   createdAt: Date;
   revokedAt: Date | null;
+  revoked: boolean; // Computed: revokedAt !== null
 }
 
 export interface CreateInvitationDTO {
