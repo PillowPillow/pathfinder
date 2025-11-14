@@ -105,18 +105,18 @@
 
 ### Implementation for User Story 1
 
-- [ ] T050 [US1] Create CreateCampaign use case in src/application/useCases/CreateCampaign.ts
-- [ ] T051 [US1] Create GenerateInvitation use case in src/application/useCases/GenerateInvitation.ts
-- [ ] T052 [US1] Create JoinCampaign use case in src/application/useCases/JoinCampaign.ts
-- [ ] T052a [US1] Create RevokeInvitation use case in src/application/useCases/RevokeInvitation.ts
-- [ ] T053 [P] [US1] Create DTO types in src/application/dto/index.ts
-- [ ] T054 [P] [US1] Implement POST /api/auth/register with email validation and password length validation (min 8 chars) in pages/api/auth/register.ts
-- [ ] T055 [P] [US1] Implement POST /api/auth/login in pages/api/auth/login.ts
-- [ ] T056 [P] [US1] Implement GET /api/auth/session in pages/api/auth/session.ts
-- [ ] T057 [P] [US1] Implement POST /api/campaigns/create in pages/api/campaigns/create.ts
-- [ ] T058 [P] [US1] Implement POST /api/campaigns/invite in pages/api/campaigns/invite.ts
-- [ ] T058a [P] [US1] Implement DELETE /api/campaigns/invite/[token] (revoke invitation) in pages/api/campaigns/invite/[token].ts
-- [ ] T059 [P] [US1] Implement GET /api/campaigns/[id] in pages/api/campaigns/[id].ts
+- [X] T050 [US1] Create CreateCampaign use case in src/application/useCases/CreateCampaign.ts
+- [X] T051 [US1] Create GenerateInvitation use case in src/application/useCases/GenerateInvitation.ts
+- [X] T052 [US1] Create JoinCampaign use case in src/application/useCases/JoinCampaign.ts
+- [X] T052a [US1] Create RevokeInvitation use case in src/application/useCases/RevokeInvitation.ts
+- [X] T053 [P] [US1] Create DTO types in src/application/dto/index.ts
+- [X] T054 [P] [US1] Implement POST /api/auth/register with email validation and password length validation (min 8 chars) in pages/api/auth/register.ts
+- [X] T055 [P] [US1] Implement POST /api/auth/login in pages/api/auth/login.ts
+- [X] T056 [P] [US1] Implement GET /api/auth/session in pages/api/auth/session.ts
+- [X] T057 [P] [US1] Implement POST /api/campaigns/create in pages/api/campaigns/create.ts
+- [X] T058 [P] [US1] Implement POST /api/campaigns/invite in pages/api/campaigns/invite.ts
+- [X] T058a [P] [US1] Implement DELETE /api/campaigns/invite/[token] (revoke invitation) in pages/api/campaigns/invite/[token].ts
+- [X] T059 [P] [US1] Implement GET /api/campaigns/[id] in pages/api/campaigns/[id].ts
 - [ ] T060 [P] [US1] Create registration page in pages/register.tsx
 - [ ] T061 [P] [US1] Create login page in pages/login.tsx
 - [ ] T062 [P] [US1] Create home/landing page in pages/index.tsx
