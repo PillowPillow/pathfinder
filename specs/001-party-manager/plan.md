@@ -169,7 +169,7 @@ specs/[###-feature]/
 ### Source Code (repository root)
 
 ```text
-# Next.js 11 full-stack web application structure
+# Next.js 16 full-stack web application structure
 pages/
 ├── api/                      # Next.js API routes (backend endpoints)
 │   ├── auth/                 # Authentication endpoints

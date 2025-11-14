@@ -104,8 +104,8 @@ Players can only view and edit their own character sheets, while GMs can view an
 
 ### Edge Cases
 
-- What happens when a player tries to join a campaign using an expired or revoked invitation token?
-- How does the system handle a player attempting to create a second living character?
+- What happens when a player tries to join a campaign using an expired or revoked invitation token? **Resolution**: System displays "This invitation link is no longer valid" message and prevents campaign join. GM can generate a new invitation if needed.
+- How does the system handle a player attempting to create a second living character? **Resolution**: System prevents character creation and displays "You already have a living character. Ask your GM to mark your current character as deceased or retired before creating a new one." GMs can change character status (living/deceased/retired) to allow new character creation.
 - What happens when two users (GM and player, or system conflict) attempt to save contradicting changes to the same character field simultaneously?
 - How does the system behave when a player loses network connection while editing their character?
 - What happens if a player deletes their account while having an active character in campaigns?
@@ -119,7 +119,7 @@ Players can only view and edit their own character sheets, while GMs can view an
 **Account & Authentication**
 
 - **FR-001**: System MUST allow users to create accounts with email and password
-- **FR-002**: System MUST validate email addresses and require password strength standards (minimum 8 characters)
+- **FR-002**: System MUST validate email addresses and require password strength standards (minimum 8 characters, no additional complexity requirements for MVP - uppercase/numbers/symbols optional but encouraged)
 - **FR-003**: System MUST allow users to login with their email and password credentials
 - **FR-004**: System MUST maintain user sessions across browser tabs and device switches
 
@@ -141,6 +141,9 @@ Players can only view and edit their own character sheets, while GMs can view an
 - **FR-015**: Players MUST be able to edit all fields on their own character sheets
 - **FR-016**: System MUST validate ability scores are within reasonable ranges (1-30 typical for Pathfinder)
 - **FR-017**: System MUST persist all character data changes immediately upon save
+- **FR-017a**: Characters MUST have a status field with values: living, deceased, or retired (default: living)
+- **FR-017b**: Game Masters MUST be able to change character status to deceased or retired
+- **FR-017c**: System MUST only enforce one-living-character rule; players may create new characters when current character is deceased or retired
 
 **GM Permissions & Oversight**
 
@@ -169,7 +172,12 @@ Players can only view and edit their own character sheets, while GMs can view an
 - **FR-031**: Application MUST be fully responsive and functional on mobile phones, tablets, and desktop computers
 - **FR-032**: UI MUST use fantasy/D&D-inspired design aesthetics (parchment textures, fantasy fonts, thematic colors)
 - **FR-033**: System MUST provide clear feedback for all user actions (save confirmations, error messages, loading states)
-- **FR-034**: Navigation MUST be intuitive and follow standard web application patterns
+- **FR-034**: Navigation MUST be intuitive and follow standard web application patterns. Specifically:
+  - All features accessible within 3 clicks from home page
+  - Persistent navigation header with links to: Campaigns, Characters, Profile/Logout
+  - Breadcrumb navigation showing current location (e.g., "Campaign > Party > Character Sheet")
+  - Clear, descriptive labels for all navigation elements (no jargon or abbreviations)
+  - Back navigation available via browser back button (proper routing)
 
 ### Key Entities
 
@@ -180,8 +188,8 @@ Players can only view and edit their own character sheets, while GMs can view an
 - **Player**: Represents a User's participation in a specific Campaign. Links a User to a Campaign with a join date. Each Player can have one living Character per Campaign.
 
 - **Character**: Represents a player's Pathfinder character sheet. Belongs to one Player in one Campaign. Contains:
-  - Basic info: Character name, level, class, race
-  - Ability Scores: Force (FOR), Dextérité (DEX), Constitution (CON), Intelligence (INT), Sagesse (SAG), Charisme (CHA) - each with calculated modifier
+  - Basic info: Character name, level, class, race, status (living/deceased/retired)
+  - Ability Scores: Force (STR), Dextérité (DEX), Constitution (CON), Intelligence (INT), Sagesse (WIS), Charisme (CHA) - each with calculated modifier (Note: UI displays French names; code/DB may use English abbreviations)
   - Derived Stats: Hit points, armor class, saving throws
   - Additional data: Skills, feats, equipment, spells, notes
 
@@ -231,3 +239,5 @@ Since certain details were not specified in the original requirements, the follo
 11. **Notification Method**: In-app notifications displayed as toast/banner messages. No email or push notifications required for MVP.
 
 12. **Multi-Campaign Support**: Users can be GMs of multiple campaigns and players in multiple campaigns simultaneously.
+
+13. **Ability Score Terminology**: Ability scores use French names in the UI (Force, Dextérité, Constitution, Intelligence, Sagesse, Charisme) as specified in the original requirement. Internal code and database may use English abbreviations (STR, DEX, CON, INT, WIS, CHA) or English property names for developer clarity, but all user-facing text MUST display French terminology.
