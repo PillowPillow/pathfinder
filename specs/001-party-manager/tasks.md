@@ -26,16 +26,16 @@
 
 **Purpose**: Project initialization and basic structure per quickstart.md
 
-- [ ] T001 Initialize Next.js 16 project with TypeScript at repository root
-- [ ] T002 [P] Install core dependencies (socket.io@4.7.4, better-sqlite3@11.7.0, bcryptjs@2.4.3, uuid@9.0.1)
-- [ ] T003 [P] Install development dependencies (jest@27.5.1, @testing-library/react@12.1.5, supertest@6.3.3, tailwindcss@3.4.1)
-- [ ] T004 [P] Configure TypeScript strict mode in tsconfig.json per quickstart.md
-- [ ] T005 [P] Configure Tailwind CSS with D&D theme (parchment, ink, gold, leather colors) in tailwind.config.js
-- [ ] T006 [P] Configure Jest with coverage thresholds in jest.config.js
-- [ ] T007 [P] Configure ESLint and Prettier in .eslintrc.json and .prettierrc
-- [ ] T008 [P] Create directory structure (src/domain, src/application, src/infrastructure, src/components, pages, tests)
-- [ ] T009 Update package.json scripts (dev, test, test:ci, lint, format)
-- [ ] T010 [P] Add database/ to .gitignore for SQLite files
+- [X] T001 Initialize Next.js 16 project with TypeScript at repository root
+- [X] T002 [P] Install core dependencies (socket.io@4.7.4, better-sqlite3@11.7.0, bcryptjs@2.4.3, uuid@9.0.1)
+- [X] T003 [P] Install development dependencies (jest@29.0.0, @testing-library/react@14.0.0, supertest@6.3.3, tailwindcss@3.4.1)
+- [X] T004 [P] Configure TypeScript strict mode in tsconfig.json per quickstart.md
+- [X] T005 [P] Configure Tailwind CSS with D&D theme (parchment, ink, gold, leather colors) in tailwind.config.js
+- [X] T006 [P] Configure Jest with coverage thresholds in jest.config.js
+- [X] T007 [P] Configure ESLint and Prettier in .eslintrc.json and .prettierrc
+- [X] T008 [P] Create directory structure (src/domain, src/application, src/infrastructure, src/components, pages, tests)
+- [X] T009 Update package.json scripts (dev, test, test:ci, lint, format)
+- [X] T010 [P] Add database/ to .gitignore for SQLite files
 
 ---
 
@@ -45,35 +45,35 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T011 Create SQLite connection setup in src/infrastructure/database/sqlite.ts
-- [ ] T012 Create initial schema migration in src/infrastructure/database/migrations/001_initial_schema.sql (include Character.status enum: living/deceased/retired)
-- [ ] T013 [P] Create User entity in src/domain/entities/User.ts
-- [ ] T014 [P] Create Campaign entity in src/domain/entities/Campaign.ts
-- [ ] T015 [P] Create Invitation entity in src/domain/entities/Invitation.ts
-- [ ] T016 [P] Create Player entity in src/domain/entities/Player.ts
-- [ ] T017 [P] Create Character entity in src/domain/entities/Character.ts
-- [ ] T018 [P] Create AbilityScore value object in src/domain/entities/AbilityScore.ts
-- [ ] T019 [P] Create ActivityLog entity in src/domain/entities/ActivityLog.ts
-- [ ] T020 [P] Create AbilityCalculator domain service in src/domain/services/AbilityCalculator.ts
-- [ ] T021 [P] Create CharacterValidator domain service in src/domain/services/CharacterValidator.ts
-- [ ] T022 [P] Create CampaignRules domain service in src/domain/services/CampaignRules.ts
-- [ ] T023 [P] Create UserRepository in src/infrastructure/database/repositories/UserRepository.ts
-- [ ] T024 [P] Create CampaignRepository in src/infrastructure/database/repositories/CampaignRepository.ts
-- [ ] T025 [P] Create InvitationRepository in src/infrastructure/database/repositories/InvitationRepository.ts
-- [ ] T026 [P] Create PlayerRepository in src/infrastructure/database/repositories/PlayerRepository.ts
-- [ ] T027 [P] Create CharacterRepository in src/infrastructure/database/repositories/CharacterRepository.ts
-- [ ] T028 [P] Create ActivityLogRepository in src/infrastructure/database/repositories/ActivityLogRepository.ts
-- [ ] T029 [P] Create password hashing utilities in src/infrastructure/auth/hash.ts (bcrypt)
-- [ ] T030 [P] Create session management utilities in src/infrastructure/auth/session.ts
-- [ ] T031 Create custom Next.js server with Socket.IO in server.ts
-- [ ] T032 Create Socket.IO event type definitions in src/infrastructure/socket/events.ts
-- [ ] T033 Create Socket.IO server setup in src/infrastructure/socket/server.ts
-- [ ] T034 [P] Create base Layout component in src/components/layout/Layout.tsx
-- [ ] T035 [P] Create Header component with navigation links (Campaigns, Characters, Profile/Logout) in src/components/layout/Header.tsx
+- [X] T011 Create SQLite connection setup in src/infrastructure/database/sqlite.ts
+- [X] T012 Create initial schema migration in src/infrastructure/database/migrations/001_initial_schema.sql (include Character.status enum: living/deceased/retired)
+- [X] T013 [P] Create User entity in src/domain/entities/User.ts
+- [X] T014 [P] Create Campaign entity in src/domain/entities/Campaign.ts
+- [X] T015 [P] Create Invitation entity in src/domain/entities/Invitation.ts
+- [X] T016 [P] Create Player entity in src/domain/entities/Player.ts
+- [X] T017 [P] Create Character entity in src/domain/entities/Character.ts
+- [X] T018 [P] Create AbilityScore value object in src/domain/entities/AbilityScore.ts
+- [X] T019 [P] Create ActivityLog entity in src/domain/entities/ActivityLog.ts
+- [X] T020 [P] Create AbilityCalculator domain service in src/domain/services/AbilityCalculator.ts
+- [X] T021 [P] Create CharacterValidator domain service in src/domain/services/CharacterValidator.ts
+- [X] T022 [P] Create CampaignRules domain service in src/domain/services/CampaignRules.ts
+- [X] T023 [P] Create UserRepository in src/infrastructure/database/repositories/UserRepository.ts
+- [X] T024 [P] Create CampaignRepository in src/infrastructure/database/repositories/CampaignRepository.ts
+- [X] T025 [P] Create InvitationRepository in src/infrastructure/database/repositories/InvitationRepository.ts
+- [X] T026 [P] Create PlayerRepository in src/infrastructure/database/repositories/PlayerRepository.ts
+- [X] T027 [P] Create CharacterRepository in src/infrastructure/database/repositories/CharacterRepository.ts
+- [X] T028 [P] Create ActivityLogRepository in src/infrastructure/database/repositories/ActivityLogRepository.ts
+- [X] T029 [P] Create password hashing utilities in src/infrastructure/auth/hash.ts (bcrypt)
+- [X] T030 [P] Create session management utilities in src/infrastructure/auth/session.ts
+- [X] T031 Create custom Next.js server with Socket.IO in server.ts
+- [X] T032 Create Socket.IO event type definitions in src/infrastructure/socket/events.ts
+- [X] T033 Create Socket.IO server setup in src/infrastructure/socket/server.ts
+- [X] T034 [P] Create base Layout component in src/components/layout/Layout.tsx
+- [X] T035 [P] Create Header component with navigation links (Campaigns, Characters, Profile/Logout) in src/components/layout/Header.tsx
 - [ ] T035a [P] Create Breadcrumb component in src/components/layout/Breadcrumb.tsx
-- [ ] T036 [P] Create common Button component in src/components/common/Button.tsx
-- [ ] T037 [P] Create common Input component in src/components/common/Input.tsx
-- [ ] T038 [P] Create common Notification component in src/components/common/Notification.tsx
+- [X] T036 [P] Create common Button component in src/components/common/Button.tsx
+- [X] T037 [P] Create common Input component in src/components/common/Input.tsx
+- [X] T038 [P] Create common Notification component in src/components/common/Notification.tsx
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel
 
