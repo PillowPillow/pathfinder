@@ -19,7 +19,7 @@ npm test && npm run lint
 
 ## Code Style
 
-TypeScript with Node.js (latest LTS: 20.x): Follow standard conventions
+TypeScript with Node.js (latest LTS: 24.x): Follow standard conventions
 
 ## Recent Changes
 

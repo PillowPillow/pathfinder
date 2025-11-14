@@ -190,7 +190,7 @@ CREATE TABLE activity_logs (
 ## Node.js Version & Deployment
 
 ### Decision
-**Node.js 20.x LTS** (latest long-term support)
+**Node.js 24.x LTS** (latest long-term support)
 
 ### Rationale
 - **LTS Status**: Stable, security updates through April 2026
@@ -366,7 +366,7 @@ async function updateCharacter(characterId: number, updates: Partial<Character>,
 | **Testing** | Jest + React Testing Library + Supertest | Standard Next.js stack, TDD-friendly |
 | **Socket.IO Integration** | Custom Next.js server with attached Socket.IO | Required for WebSocket support in Next.js 11 |
 | **Database Driver** | better-sqlite3 with repository pattern | Fast, synchronous, DDD-aligned |
-| **Node Version** | Node.js 20.x LTS | Stable, performant, long-term support |
+| **Node Version** | Node.js 24.x LTS | Stable, performant, long-term support |
 | **UI Framework** | Tailwind CSS with custom D&D theme | Responsive, customizable, performant |
 | **Authentication** | bcrypt + HTTP-only cookies | Secure, simple, battle-tested |
 | **Conflict Resolution** | Last-write-wins with notifications | Simple, sufficient for MVP scope |

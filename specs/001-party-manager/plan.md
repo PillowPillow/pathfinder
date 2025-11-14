@@ -11,7 +11,7 @@ A real-time web application for Pathfinder RPG party management enabling Game Ma
 
 ## Technical Context
 
-**Language/Version**: TypeScript with Node.js (latest LTS: 20.x)
+**Language/Version**: TypeScript with Node.js (latest LTS: 24.x)
 **Primary Dependencies**: Next.js 16, React 18.x, Socket.IO 4.x, better-sqlite3 (SQLite driver)
 **Storage**: SQLite database (local file-based, simple single-file DB)
 **Testing**: NEEDS CLARIFICATION (Jest + React Testing Library standard for Next.js)

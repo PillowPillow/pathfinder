@@ -6,7 +6,7 @@ This guide provides step-by-step instructions for setting up the development env
 
 ## Prerequisites
 
-- **Node.js**: v20.x LTS ([Download](https://nodejs.org/))
+- **Node.js**: v24.x LTS ([Download](https://nodejs.org/))
 - **npm**: v10.x (bundled with Node.js)
 - **Git**: For version control
 - **Code Editor**: VS Code recommended (with TypeScript, ESLint, Prettier extensions)
@@ -17,7 +17,7 @@ This guide provides step-by-step instructions for setting up the development env
 
 ```bash
 # From repository root
-npx create-next-app@11.1.4 . --typescript --use-npm
+npx create-next-app@16 . --typescript --use-npm
 
 # Answer prompts:
 # - Would you like to use ESLint? Yes

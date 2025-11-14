@@ -26,7 +26,7 @@
 
 **Purpose**: Project initialization and basic structure per quickstart.md
 
-- [ ] T001 Initialize Next.js 11.1.4 project with TypeScript at repository root
+- [ ] T001 Initialize Next.js 16 project with TypeScript at repository root
 - [ ] T002 [P] Install core dependencies (socket.io@4.7.4, better-sqlite3@11.7.0, bcryptjs@2.4.3, uuid@9.0.1)
 - [ ] T003 [P] Install development dependencies (jest@27.5.1, @testing-library/react@12.1.5, supertest@6.3.3, tailwindcss@3.4.1)
 - [ ] T004 [P] Configure TypeScript strict mode in tsconfig.json per quickstart.md
