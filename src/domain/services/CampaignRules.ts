@@ -1,4 +1,5 @@
 import { Character, CharacterStatus } from '../entities/Character';
+import { CampaignRepository } from '../../infrastructure/database/repositories/CampaignRepository';
 
 /**
  * CampaignRules - Domain service for enforcing campaign business rules
@@ -30,8 +31,28 @@ export class CampaignRules {
 
   /**
    * Validate GM permission for a campaign
+   * Fetches the campaign and verifies the user is the GM
    */
-  static validateGMPermission(userId: number, campaignGMId: number): {
+  async validateGMPermission(
+    campaignId: number,
+    userId: number,
+    campaignRepo: CampaignRepository
+  ): Promise<void> {
+    const campaign = await campaignRepo.findById(campaignId);
+
+    if (!campaign) {
+      throw new Error('Campaign not found');
+    }
+
+    if (campaign.gmUserId !== userId) {
+      throw new Error('Only the Game Master can perform this action');
+    }
+  }
+
+  /**
+   * Validate GM permission (static version for backward compatibility)
+   */
+  static validateGMPermissionSync(userId: number, campaignGMId: number): {
     hasPermission: boolean;
     reason?: string;
   } {

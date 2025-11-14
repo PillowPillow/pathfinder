@@ -1,8 +1,8 @@
-import db from '../sqlite';
-import { Player, CreatePlayerDTO } from '@/domain/entities/Player';
+import { db } from '../sqlite';
+import { Player, CreatePlayerDTO } from '../../../domain/entities/Player';
 
 export class PlayerRepository {
-  static create(dto: CreatePlayerDTO): Player {
+  async create(dto: CreatePlayerDTO): Promise<Player> {
     const stmt = db.prepare(`
       INSERT INTO players (user_id, campaign_id)
       VALUES (?, ?)
@@ -10,10 +10,10 @@ export class PlayerRepository {
 
     const result = stmt.run(dto.userId, dto.campaignId);
 
-    return this.findById(Number(result.lastInsertRowid))!;
+    return (await this.findById(Number(result.lastInsertRowid)))!;
   }
 
-  static findById(id: number): Player | null {
+  async findById(id: number): Promise<Player | null> {
     const stmt = db.prepare(`
       SELECT id, user_id as userId, campaign_id as campaignId, joined_at as joinedAt
       FROM players
@@ -29,7 +29,7 @@ export class PlayerRepository {
     };
   }
 
-  static findByUserAndCampaign(userId: number, campaignId: number): Player | null {
+  async findByUserAndCampaign(userId: number, campaignId: number): Promise<Player | null> {
     const stmt = db.prepare(`
       SELECT id, user_id as userId, campaign_id as campaignId, joined_at as joinedAt
       FROM players
@@ -45,7 +45,7 @@ export class PlayerRepository {
     };
   }
 
-  static findByCampaign(campaignId: number): Player[] {
+  async findByCampaign(campaignId: number): Promise<Player[]> {
     const stmt = db.prepare(`
       SELECT id, user_id as userId, campaign_id as campaignId, joined_at as joinedAt
       FROM players

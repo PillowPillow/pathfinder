@@ -1,8 +1,8 @@
-import db from '../sqlite';
-import { ActivityLog, CreateActivityLogDTO } from '@/domain/entities/ActivityLog';
+import { db } from '../sqlite';
+import { ActivityLog, CreateActivityLogDTO } from '../../../domain/entities/ActivityLog';
 
 export class ActivityLogRepository {
-  static create(dto: CreateActivityLogDTO): ActivityLog {
+  async create(dto: CreateActivityLogDTO): Promise<ActivityLog> {
     const stmt = db.prepare(`
       INSERT INTO activity_logs (character_id, user_id, field_name, old_value, new_value)
       VALUES (?, ?, ?, ?, ?)
@@ -16,10 +16,10 @@ export class ActivityLogRepository {
       dto.newValue
     );
 
-    return this.findById(Number(result.lastInsertRowid))!;
+    return (await this.findById(Number(result.lastInsertRowid)))!;
   }
 
-  static findById(id: number): ActivityLog | null {
+  async findById(id: number): Promise<ActivityLog | null> {
     const stmt = db.prepare(`
       SELECT id, character_id as characterId, user_id as userId,
              field_name as fieldName, old_value as oldValue,
@@ -37,7 +37,7 @@ export class ActivityLogRepository {
     };
   }
 
-  static findByCharacter(characterId: number, limit: number = 50): ActivityLog[] {
+  async findByCharacter(characterId: number, limit: number = 50): Promise<ActivityLog[]> {
     const stmt = db.prepare(`
       SELECT id, character_id as characterId, user_id as userId,
              field_name as fieldName, old_value as oldValue,

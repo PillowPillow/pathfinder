@@ -39,4 +39,5 @@ export function runMigrations(): void {
   }
 }
 
+export { db };
 export default db;

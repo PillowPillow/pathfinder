@@ -4,6 +4,57 @@
  */
 import { generateSessionToken, createSession, validateSession, destroySession } from '../../../../src/infrastructure/auth/session';
 
+// Mock the database module
+jest.mock('../../../../src/infrastructure/database/sqlite', () => {
+  const sessions = new Map();
+  const users = new Map();
+
+  // Add a test user
+  users.set(1, {
+    id: 1,
+    email: 'test@example.com',
+    display_name: 'Test User',
+  });
+
+  return {
+    db: {
+      prepare: jest.fn((sql: string) => ({
+        run: jest.fn((...args: any[]) => {
+          if (sql.includes('INSERT INTO sessions')) {
+            const [userId, token, expiresAt] = args;
+            sessions.set(token, { user_id: userId, expires_at: expiresAt });
+            return { lastInsertRowid: 1, changes: 1 };
+          }
+          if (sql.includes('DELETE FROM sessions')) {
+            const [token] = args;
+            sessions.delete(token);
+            return { changes: 1 };
+          }
+          return { lastInsertRowid: 1, changes: 1 };
+        }),
+        get: jest.fn((...args: any[]) => {
+          if (sql.includes('SELECT s.user_id')) {
+            const [token] = args;
+            const session = sessions.get(token);
+            if (!session) return null;
+            const user = users.get(session.user_id);
+            if (!user) return null;
+            return {
+              user_id: session.user_id,
+              expires_at: session.expires_at,
+              email: user.email,
+              display_name: user.display_name,
+            };
+          }
+          return null;
+        }),
+        all: jest.fn(() => []),
+      })),
+      exec: jest.fn(),
+    },
+  };
+});
+
 describe('Session Management', () => {
   describe('generateSessionToken', () => {
     it('should generate a random token', () => {

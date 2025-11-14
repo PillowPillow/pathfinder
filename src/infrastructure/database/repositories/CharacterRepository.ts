@@ -1,9 +1,9 @@
-import db from '../sqlite';
-import { Character, CreateCharacterDTO, UpdateCharacterDTO } from '@/domain/entities/Character';
-import { AbilityScores } from '@/domain/entities/AbilityScore';
+import { db } from '../sqlite';
+import { Character, CreateCharacterDTO, UpdateCharacterDTO } from '../../../domain/entities/Character';
+import { AbilityScores } from '../../../domain/entities/AbilityScore';
 
 export class CharacterRepository {
-  static create(dto: CreateCharacterDTO): Character {
+  async create(dto: CreateCharacterDTO): Promise<Character> {
     const stmt = db.prepare(`
       INSERT INTO characters (
         player_id, name, status, class, race,
@@ -26,10 +26,10 @@ export class CharacterRepository {
       dto.charisma
     );
 
-    return this.findById(Number(result.lastInsertRowid))!;
+    return (await this.findById(Number(result.lastInsertRowid)))!;
   }
 
-  static findById(id: number): Character | null {
+  async findById(id: number): Promise<Character | null> {
     const stmt = db.prepare(`
       SELECT * FROM characters WHERE id = ?
     `);
@@ -40,7 +40,7 @@ export class CharacterRepository {
     return this.mapRowToCharacter(row);
   }
 
-  static findByPlayerId(playerId: number): Character[] {
+  async findByPlayerId(playerId: number): Promise<Character[]> {
     const stmt = db.prepare(`
       SELECT * FROM characters WHERE player_id = ? ORDER BY created_at DESC
     `);
@@ -49,7 +49,7 @@ export class CharacterRepository {
     return rows.map(this.mapRowToCharacter);
   }
 
-  static findLivingByPlayerId(playerId: number): Character[] {
+  async findLivingByPlayerId(playerId: number): Promise<Character[]> {
     const stmt = db.prepare(`
       SELECT * FROM characters WHERE player_id = ? AND status = 'living' ORDER BY created_at DESC
     `);
@@ -58,7 +58,7 @@ export class CharacterRepository {
     return rows.map(this.mapRowToCharacter);
   }
 
-  static update(id: number, updates: UpdateCharacterDTO): Character | null {
+  async update(id: number, updates: UpdateCharacterDTO): Promise<Character | null> {
     const fields: string[] = ['updated_at = CURRENT_TIMESTAMP'];
     const values: any[] = [];
 
@@ -135,10 +135,10 @@ export class CharacterRepository {
 
     stmt.run(...values);
 
-    return this.findById(id);
+    return await this.findById(id);
   }
 
-  static updateStatus(id: number, status: 'living' | 'deceased' | 'retired'): Character | null {
+  async updateStatus(id: number, status: 'living' | 'deceased' | 'retired'): Promise<Character | null> {
     const stmt = db.prepare(`
       UPDATE characters
       SET status = ?, updated_at = CURRENT_TIMESTAMP
@@ -147,10 +147,10 @@ export class CharacterRepository {
 
     stmt.run(status, id);
 
-    return this.findById(id);
+    return await this.findById(id);
   }
 
-  private static mapRowToCharacter(row: any): Character {
+  private mapRowToCharacter(row: any): Character {
     const abilityScores: AbilityScores = {
       strength: row.strength,
       dexterity: row.dexterity,

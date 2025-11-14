@@ -1,8 +1,8 @@
-import db from '../sqlite';
-import { Campaign, CreateCampaignDTO } from '@/domain/entities/Campaign';
+import { db } from '../sqlite';
+import { Campaign, CreateCampaignDTO } from '../../../domain/entities/Campaign';
 
 export class CampaignRepository {
-  static create(dto: CreateCampaignDTO): Campaign {
+  async create(dto: CreateCampaignDTO): Promise<Campaign> {
     const stmt = db.prepare(`
       INSERT INTO campaigns (name, description, gm_user_id)
       VALUES (?, ?, ?)
@@ -10,10 +10,10 @@ export class CampaignRepository {
 
     const result = stmt.run(dto.name, dto.description || null, dto.gmUserId);
 
-    return this.findById(Number(result.lastInsertRowid))!;
+    return (await this.findById(Number(result.lastInsertRowid)))!;
   }
 
-  static findById(id: number): Campaign | null {
+  async findById(id: number): Promise<Campaign | null> {
     const stmt = db.prepare(`
       SELECT id, name, description, gm_user_id as gmUserId, created_at as createdAt
       FROM campaigns
@@ -29,7 +29,7 @@ export class CampaignRepository {
     };
   }
 
-  static findByGM(gmUserId: number): Campaign[] {
+  async findByGM(gmUserId: number): Promise<Campaign[]> {
     const stmt = db.prepare(`
       SELECT id, name, description, gm_user_id as gmUserId, created_at as createdAt
       FROM campaigns
@@ -45,7 +45,7 @@ export class CampaignRepository {
     }));
   }
 
-  static update(id: number, updates: Partial<Pick<Campaign, 'name' | 'description'>>): Campaign | null {
+  async update(id: number, updates: Partial<Pick<Campaign, 'name' | 'description'>>): Promise<Campaign | null> {
     const fields: string[] = [];
     const values: any[] = [];
 
@@ -60,7 +60,7 @@ export class CampaignRepository {
     }
 
     if (fields.length === 0) {
-      return this.findById(id);
+      return await this.findById(id);
     }
 
     values.push(id);
@@ -73,10 +73,10 @@ export class CampaignRepository {
 
     stmt.run(...values);
 
-    return this.findById(id);
+    return await this.findById(id);
   }
 
-  static delete(id: number): boolean {
+  async delete(id: number): Promise<boolean> {
     const stmt = db.prepare('DELETE FROM campaigns WHERE id = ?');
     const result = stmt.run(id);
     return result.changes > 0;
