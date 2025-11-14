@@ -1,0 +1,814 @@
+openapi: 3.0.3
+info:
+  title: Pathfinder Party Manager API
+  description: REST API for managing Pathfinder RPG campaigns, characters, and real-time collaboration
+  version: 1.0.0
+  contact:
+    name: Pathfinder Party Manager Team
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+
+tags:
+  - name: Authentication
+    description: User registration, login, and session management
+  - name: Campaigns
+    description: Campaign creation, management, and invitations
+  - name: Characters
+    description: Character sheet creation, viewing, and updates
+  - name: Players
+    description: Player management within campaigns
+
+paths:
+  # ==================== Authentication ====================
+  /auth/register:
+    post:
+      summary: Register new user account
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, displayName]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "player@example.com"
+                password:
+                  type: string
+                  minLength: 8
+                  example: "SecurePass123"
+                displayName:
+                  type: string
+                  minLength: 2
+                  maxLength: 50
+                  example: "Gandalf"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/login:
+    post:
+      summary: Login with email and password
+      tags: [Authentication]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: "session=abc123; HttpOnly; Path=/"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /auth/session:
+    get:
+      summary: Get current user session
+      tags: [Authentication]
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+    delete:
+      summary: Logout (destroy session)
+      tags: [Authentication]
+      security:
+        - sessionCookie: []
+      responses:
+        '204':
+          description: Logged out successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ==================== Campaigns ====================
+  /campaigns/create:
+    post:
+      summary: Create new campaign (user becomes GM)
+      tags: [Campaigns]
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                  example: "Rise of the Runelords"
+                description:
+                  type: string
+                  maxLength: 500
+                  example: "A classic Pathfinder adventure path"
+      responses:
+        '201':
+          description: Campaign created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /campaigns/{id}:
+    get:
+      summary: Get campaign details
+      tags: [Campaigns]
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignId'
+      responses:
+        '200':
+          description: Campaign details with players and characters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignDetailResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Update campaign (GM only)
+      tags: [Campaigns]
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+                description:
+                  type: string
+                  maxLength: 500
+      responses:
+        '200':
+          description: Campaign updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Only GM can update campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Delete campaign (GM only, no active characters)
+      tags: [Campaigns]
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CampaignId'
+      responses:
+        '204':
+          description: Campaign deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Only GM can delete campaign or campaign has active characters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /campaigns/invite:
+    post:
+      summary: Generate invitation link for campaign (GM only)
+      tags: [Campaigns]
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [campaignId]
+              properties:
+                campaignId:
+                  type: integer
+                  example: 1
+      responses:
+        '201':
+          description: Invitation created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Only GM can generate invitations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /campaigns/invite/{token}:
+    get:
+      summary: Get campaign info from invitation token (public)
+      tags: [Campaigns]
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "a1b2c3d4e5f6..."
+      responses:
+        '200':
+          description: Campaign invitation details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaignId:
+                    type: integer
+                  campaignName:
+                    type: string
+                  gmName:
+                    type: string
+                  token:
+                    type: string
+        '404':
+          description: Invalid or revoked invitation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      summary: Join campaign using invitation token
+      tags: [Campaigns]
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '201':
+          description: Successfully joined campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerResponse'
+        '400':
+          description: Already joined this campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Invalid or revoked invitation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # ==================== Characters ====================
+  /characters/create:
+    post:
+      summary: Create new character in campaign
+      tags: [Characters]
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCharacterRequest'
+      responses:
+        '201':
+          description: Character created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharacterResponse'
+        '400':
+          description: Validation error or one-living-character rule violated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Not a player in this campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /characters/{id}:
+    get:
+      summary: Get character sheet details
+      tags: [Characters]
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CharacterId'
+      responses:
+        '200':
+          description: Character sheet with calculated modifiers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharacterResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Can only view own character (or GM can view all)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Update character sheet
+      tags: [Characters]
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CharacterId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCharacterRequest'
+      responses:
+        '200':
+          description: Character updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CharacterResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Can only edit own character (or GM can edit all)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflict - character was updated by another user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete character (owner or GM only)
+      tags: [Characters]
+      security:
+        - sessionCookie: []
+      parameters:
+        - $ref: '#/components/parameters/CharacterId'
+      responses:
+        '204':
+          description: Character deleted successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+# ==================== Components ====================
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session
+
+  parameters:
+    CampaignId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+    CharacterId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      example: 1
+
+  schemas:
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+          example: "ValidationError"
+        message:
+          type: string
+          example: "Email is already registered"
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: "player@example.com"
+        displayName:
+          type: string
+          example: "Gandalf"
+        createdAt:
+          type: string
+          format: date-time
+
+    CampaignResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Rise of the Runelords"
+        description:
+          type: string
+          nullable: true
+          example: "A classic Pathfinder adventure path"
+        gmUserId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+
+    CampaignDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/CampaignResponse'
+        - type: object
+          properties:
+            gm:
+              $ref: '#/components/schemas/UserResponse'
+            players:
+              type: array
+              items:
+                $ref: '#/components/schemas/PlayerResponse'
+            characters:
+              type: array
+              items:
+                $ref: '#/components/schemas/CharacterResponse'
+
+    InvitationResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        campaignId:
+          type: integer
+          example: 1
+        token:
+          type: string
+          example: "a1b2c3d4e5f6..."
+        inviteUrl:
+          type: string
+          example: "http://localhost:3000/campaigns/invite/a1b2c3d4e5f6..."
+        createdAt:
+          type: string
+          format: date-time
+        revoked:
+          type: boolean
+          example: false
+
+    PlayerResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 2
+        campaignId:
+          type: integer
+          example: 1
+        user:
+          $ref: '#/components/schemas/UserResponse'
+        joinedAt:
+          type: string
+          format: date-time
+
+    CreateCharacterRequest:
+      type: object
+      required: [playerId, name, strength, dexterity, constitution, intelligence, wisdom, charisma]
+      properties:
+        playerId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+          example: "Valeros the Fighter"
+        level:
+          type: integer
+          minimum: 1
+          maximum: 20
+          default: 1
+        race:
+          type: string
+          maxLength: 50
+          example: "Human"
+        class:
+          type: string
+          maxLength: 50
+          example: "Fighter"
+        strength:
+          type: integer
+          minimum: 1
+          maximum: 30
+          example: 16
+        dexterity:
+          type: integer
+          minimum: 1
+          maximum: 30
+          example: 14
+        constitution:
+          type: integer
+          minimum: 1
+          maximum: 30
+          example: 14
+        intelligence:
+          type: integer
+          minimum: 1
+          maximum: 30
+          example: 10
+        wisdom:
+          type: integer
+          minimum: 1
+          maximum: 30
+          example: 12
+        charisma:
+          type: integer
+          minimum: 1
+          maximum: 30
+          example: 8
+
+    UpdateCharacterRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 2
+          maxLength: 50
+        level:
+          type: integer
+          minimum: 1
+          maximum: 20
+        race:
+          type: string
+          maxLength: 50
+        class:
+          type: string
+          maxLength: 50
+        strength:
+          type: integer
+          minimum: 1
+          maximum: 30
+        dexterity:
+          type: integer
+          minimum: 1
+          maximum: 30
+        constitution:
+          type: integer
+          minimum: 1
+          maximum: 30
+        intelligence:
+          type: integer
+          minimum: 1
+          maximum: 30
+        wisdom:
+          type: integer
+          minimum: 1
+          maximum: 30
+        charisma:
+          type: integer
+          minimum: 1
+          maximum: 30
+        hitPoints:
+          type: integer
+          minimum: 0
+        armorClass:
+          type: integer
+          minimum: 1
+          maximum: 50
+        isAlive:
+          type: boolean
+          description: "GM can set to false to mark character as deceased/retired"
+
+    CharacterResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        playerId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "Valeros the Fighter"
+        level:
+          type: integer
+          example: 1
+        race:
+          type: string
+          nullable: true
+          example: "Human"
+        class:
+          type: string
+          nullable: true
+          example: "Fighter"
+        strength:
+          type: integer
+          example: 16
+        dexterity:
+          type: integer
+          example: 14
+        constitution:
+          type: integer
+          example: 14
+        intelligence:
+          type: integer
+          example: 10
+        wisdom:
+          type: integer
+          example: 12
+        charisma:
+          type: integer
+          example: 8
+        hitPoints:
+          type: integer
+          nullable: true
+          example: 12
+        armorClass:
+          type: integer
+          nullable: true
+          example: 16
+        isAlive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        modifiers:
+          type: object
+          description: "Calculated ability modifiers (not stored, computed on-demand)"
+          properties:
+            strength:
+              type: integer
+              example: 3
+            dexterity:
+              type: integer
+              example: 2
+            constitution:
+              type: integer
+              example: 2
+            intelligence:
+              type: integer
+              example: 0
+            wisdom:
+              type: integer
+              example: 1
+            charisma:
+              type: integer
+              example: -1
+
+  responses:
+    BadRequest:
+      description: Invalid request data
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Unauthorized:
+      description: Not authenticated (no valid session)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    Forbidden:
+      description: Authenticated but not authorized for this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
