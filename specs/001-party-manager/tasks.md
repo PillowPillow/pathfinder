@@ -117,16 +117,16 @@
 - [X] T058 [P] [US1] Implement POST /api/campaigns/invite in pages/api/campaigns/invite.ts
 - [X] T058a [P] [US1] Implement DELETE /api/campaigns/invite/[token] (revoke invitation) in pages/api/campaigns/invite/[token].ts
 - [X] T059 [P] [US1] Implement GET /api/campaigns/[id] in pages/api/campaigns/[id].ts
-- [ ] T060 [P] [US1] Create registration page in pages/register.tsx
-- [ ] T061 [P] [US1] Create login page in pages/login.tsx
-- [ ] T062 [P] [US1] Create home/landing page in pages/index.tsx
-- [ ] T063 [P] [US1] Create campaign dashboard page in pages/campaigns/[id].tsx
-- [ ] T064 [P] [US1] Create invitation landing page in pages/campaigns/invite/[token].tsx
-- [ ] T065 [P] [US1] Create CampaignCard component in src/components/campaign/CampaignCard.tsx
-- [ ] T066 [P] [US1] Create InviteLink component in src/components/campaign/InviteLink.tsx
-- [ ] T066a [P] [US1] Add invitation revocation control to InviteLink component (revoke button for GM)
-- [ ] T067 [US1] Add validation and error handling for campaign operations
-- [ ] T068 [US1] Add logging for campaign and authentication operations
+- [X] T060 [P] [US1] Create registration page in pages/register.tsx
+- [X] T061 [P] [US1] Create login page in pages/login.tsx
+- [X] T062 [P] [US1] Create home/landing page in pages/index.tsx
+- [X] T063 [P] [US1] Create campaign dashboard page in pages/campaigns/[id].tsx
+- [X] T064 [P] [US1] Create invitation landing page in pages/campaigns/invite/[token].tsx
+- [X] T065 [P] [US1] Create CampaignCard component in src/components/campaign/CampaignCard.tsx
+- [X] T066 [P] [US1] Create InviteLink component in src/components/campaign/InviteLink.tsx
+- [X] T066a [P] [US1] Add invitation revocation control to InviteLink component (revoke button for GM)
+- [X] T067 [US1] Add validation and error handling for campaign operations
+- [X] T068 [US1] Add logging for campaign and authentication operations
 
 **Checkpoint**: At this point, User Story 1 should be fully functional - GMs can create campaigns, generate invites, players can join
 
