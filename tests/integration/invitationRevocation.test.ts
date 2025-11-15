@@ -4,10 +4,11 @@
  */
 import { createMocks } from 'node-mocks-http';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { extractSessionToken } from '../helpers/cookies';
 
 describe('Invitation Revocation Workflow Integration', () => {
-  let gmSessionCookie: string;
-  let playerSessionCookie: string;
+  let gmSessionToken: string;
+  let playerSessionToken: string;
   let campaignId: number;
 
   beforeAll(async () => {
@@ -32,12 +33,12 @@ describe('Invitation Revocation Workflow Integration', () => {
     });
     const loginHandler = (await import('../../pages/api/auth/login')).default;
     await loginHandler(gmLoginReq, gmLoginRes);
-    gmSessionCookie = gmLoginRes._getHeaders()['set-cookie'][0].split(';')[0];
+    gmSessionToken = extractSessionToken(gmLoginRes._getHeaders()['set-cookie']);
 
     const { req: campaignReq, res: campaignRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       body: {
         name: 'Revocation Test Campaign',
@@ -66,15 +67,15 @@ describe('Invitation Revocation Workflow Integration', () => {
       },
     });
     await loginHandler(playerLoginReq, playerLoginRes);
-    playerSessionCookie = playerLoginRes._getHeaders()['set-cookie'][0].split(';')[0];
+    playerSessionToken = extractSessionToken(playerLoginRes._getHeaders()['set-cookie']);
   });
 
   it('should prevent usage of revoked invitation', async () => {
     // Step 1: GM creates invitation
     const { req: inviteReq, res: inviteRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       body: {
         campaignId,
@@ -100,8 +101,8 @@ describe('Invitation Revocation Workflow Integration', () => {
     // Step 3: GM revokes invitation
     const { req: revokeReq, res: revokeRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'DELETE',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       query: {
         token,
@@ -124,8 +125,8 @@ describe('Invitation Revocation Workflow Integration', () => {
     // Step 5: Verify player cannot join with revoked token
     const { req: joinReq, res: joinRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: playerSessionCookie,
+      cookies: {
+        session: playerSessionToken!,
       },
       query: {
         token,
@@ -144,8 +145,8 @@ describe('Invitation Revocation Workflow Integration', () => {
     for (let i = 0; i < 3; i++) {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         body: {
           campaignId,
@@ -162,8 +163,8 @@ describe('Invitation Revocation Workflow Integration', () => {
     for (const token of tokens) {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'DELETE',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         query: {
           token,
@@ -192,8 +193,8 @@ describe('Invitation Revocation Workflow Integration', () => {
     // Create invitation
     const { req: inviteReq, res: inviteRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       body: {
         campaignId,
@@ -206,8 +207,8 @@ describe('Invitation Revocation Workflow Integration', () => {
     // Try to revoke as player
     const { req: revokeReq, res: revokeRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'DELETE',
-      headers: {
-        cookie: playerSessionCookie,
+      cookies: {
+        session: playerSessionToken!,
       },
       query: {
         token,

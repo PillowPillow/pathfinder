@@ -4,10 +4,11 @@
  */
 import { createMocks } from 'node-mocks-http';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { extractSessionToken } from '../helpers/cookies';
 
 describe('Player Invitation Workflow Integration', () => {
-  let gmSessionCookie: string;
-  let playerSessionCookie: string;
+  let gmSessionToken: string;
+  let playerSessionToken: string;
   let campaignId: number;
   let invitationToken: string;
 
@@ -33,12 +34,12 @@ describe('Player Invitation Workflow Integration', () => {
     });
     const loginHandler = (await import('../../pages/api/auth/login')).default;
     await loginHandler(gmLoginReq, gmLoginRes);
-    gmSessionCookie = gmLoginRes._getHeaders()['set-cookie'][0].split(';')[0];
+    gmSessionToken = extractSessionToken(gmLoginRes._getHeaders()['set-cookie']);
 
     const { req: campaignReq, res: campaignRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       body: {
         name: 'Invitation Test Campaign',
@@ -68,15 +69,15 @@ describe('Player Invitation Workflow Integration', () => {
       },
     });
     await loginHandler(playerLoginReq, playerLoginRes);
-    playerSessionCookie = playerLoginRes._getHeaders()['set-cookie'][0].split(';')[0];
+    playerSessionToken = extractSessionToken(playerLoginRes._getHeaders()['set-cookie']);
   });
 
   it('should complete full player invitation workflow', async () => {
     // Step 1: GM generates invitation
     const { req: inviteReq, res: inviteRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       body: {
         campaignId,
@@ -112,8 +113,8 @@ describe('Player Invitation Workflow Integration', () => {
     // Step 3: Player joins campaign using token
     const { req: joinReq, res: joinRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: playerSessionCookie,
+      cookies: {
+        session: playerSessionToken!,
       },
       query: {
         token: invitationToken,
@@ -131,8 +132,8 @@ describe('Player Invitation Workflow Integration', () => {
     // Step 4: Verify player is in campaign
     const { req: getCampaignReq, res: getCampaignRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: {
-        cookie: playerSessionCookie,
+      cookies: {
+        session: playerSessionToken!,
       },
       query: {
         id: campaignId.toString(),
@@ -152,8 +153,8 @@ describe('Player Invitation Workflow Integration', () => {
     // Step 1: GM generates new invitation
     const { req: inviteReq, res: inviteRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       body: {
         campaignId,
@@ -166,8 +167,8 @@ describe('Player Invitation Workflow Integration', () => {
     // Step 2: GM revokes invitation
     const { req: revokeReq, res: revokeRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'DELETE',
-      headers: {
-        cookie: gmSessionCookie,
+      cookies: {
+        session: gmSessionToken!,
       },
       query: {
         token: newToken,
@@ -180,8 +181,8 @@ describe('Player Invitation Workflow Integration', () => {
     // Step 3: Player tries to join with revoked token
     const { req: joinReq, res: joinRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: playerSessionCookie,
+      cookies: {
+        session: playerSessionToken!,
       },
       query: {
         token: newToken,
@@ -199,8 +200,8 @@ describe('Player Invitation Workflow Integration', () => {
     // Player tries to join the same campaign again
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: playerSessionCookie,
+      cookies: {
+        session: playerSessionToken!,
       },
       query: {
         token: invitationToken,

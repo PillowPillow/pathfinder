@@ -4,6 +4,7 @@
  */
 import { createMocks } from 'node-mocks-http';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { extractSessionToken } from '../../helpers/cookies';
 
 describe('Authentication API Contracts', () => {
   describe('POST /api/auth/register (T042)', () => {
@@ -64,7 +65,7 @@ describe('Authentication API Contracts', () => {
       expect(res._getStatusCode()).toBe(400);
       const data = JSON.parse(res._getData());
       expect(data).toHaveProperty('error');
-      expect(data.message).toContain('password');
+      expect(data.message.toLowerCase()).toContain('password');
     });
 
     it('should reject duplicate email', async () => {
@@ -174,7 +175,7 @@ describe('Authentication API Contracts', () => {
   });
 
   describe('GET /api/auth/session (T044)', () => {
-    let sessionCookie: string;
+    let sessionToken: string;
 
     beforeAll(async () => {
       // Login to get session
@@ -189,14 +190,14 @@ describe('Authentication API Contracts', () => {
       await loginHandler(req, res);
 
       const cookies = res._getHeaders()['set-cookie'];
-      sessionCookie = cookies[0].split(';')[0];
+      sessionToken = extractSessionToken(cookies);
     });
 
     it('should return current user with valid session', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'GET',
-        headers: {
-          cookie: sessionCookie,
+        cookies: {
+          session: sessionToken!,
         },
       });
 

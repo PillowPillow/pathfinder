@@ -4,6 +4,7 @@
  */
 import { createMocks } from 'node-mocks-http';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { extractSessionToken } from '../helpers/cookies';
 
 describe('Campaign Creation Workflow Integration', () => {
   it('should complete full campaign creation workflow', async () => {
@@ -36,15 +37,14 @@ describe('Campaign Creation Workflow Integration', () => {
     await loginHandler(loginReq, loginRes);
 
     expect(loginRes._getStatusCode()).toBe(200);
-    const cookies = loginRes._getHeaders()['set-cookie'];
-    expect(cookies).toBeDefined();
-    const sessionCookie = cookies[0].split(';')[0];
+    const sessionToken = extractSessionToken(loginRes._getHeaders()['set-cookie']);
+    expect(sessionToken).toBeDefined();
 
     // Step 3: Verify session
-    const { req: sessionReq, res: sessionRes } = createMocks<NextApiRequest, NextApiResponse>({
+    const { req: sessionReq, res: sessionRes} = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: {
-        cookie: sessionCookie,
+      cookies: {
+        session: sessionToken!,
       },
     });
     const sessionHandler = (await import('../../pages/api/auth/session')).default;
@@ -57,8 +57,8 @@ describe('Campaign Creation Workflow Integration', () => {
     // Step 4: Create campaign
     const { req: campaignReq, res: campaignRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: sessionCookie,
+      cookies: {
+        session: sessionToken!,
       },
       body: {
         name: 'Integration Test Campaign',
@@ -77,8 +77,8 @@ describe('Campaign Creation Workflow Integration', () => {
     // Step 5: Retrieve campaign details
     const { req: getReq, res: getRes } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'GET',
-      headers: {
-        cookie: sessionCookie,
+      cookies: {
+        session: sessionToken!,
       },
       query: {
         id: campaignData.id.toString(),
@@ -104,13 +104,13 @@ describe('Campaign Creation Workflow Integration', () => {
     });
     const loginHandler = (await import('../../pages/api/auth/login')).default;
     await loginHandler(loginReq, loginRes);
-    const sessionCookie = loginRes._getHeaders()['set-cookie'][0].split(';')[0];
+    const sessionToken = extractSessionToken(loginRes._getHeaders()['set-cookie']);
 
     // Try to create campaign with invalid name
     const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
       method: 'POST',
-      headers: {
-        cookie: sessionCookie,
+      cookies: {
+        session: sessionToken!,
       },
       body: {
         name: 'AB', // Too short

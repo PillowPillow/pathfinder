@@ -5,9 +5,10 @@
  */
 import { createMocks } from 'node-mocks-http';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { extractSessionToken } from '../../helpers/cookies';
 
 describe('Campaign API Contracts', () => {
-  let gmSessionCookie: string;
+  let gmSessionToken: string;
   let gmUserId: number;
   let campaignId: number;
   let invitationToken: string;
@@ -36,15 +37,15 @@ describe('Campaign API Contracts', () => {
     const loginHandler = (await import('../../../pages/api/auth/login')).default;
     await loginHandler(loginReq, loginRes);
     const cookies = loginRes._getHeaders()['set-cookie'];
-    gmSessionCookie = cookies[0].split(';')[0];
+    gmSessionToken = extractSessionToken(cookies);
   });
 
   describe('POST /api/campaigns/create (T045)', () => {
     it('should create campaign with authenticated GM', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         body: {
           name: 'Rise of the Runelords',
@@ -84,8 +85,8 @@ describe('Campaign API Contracts', () => {
     it('should reject campaign with name too short (<3 chars)', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         body: {
           name: 'AB',
@@ -104,8 +105,8 @@ describe('Campaign API Contracts', () => {
     it('should create campaign with optional description', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         body: {
           name: 'Campaign Without Description',
@@ -125,8 +126,8 @@ describe('Campaign API Contracts', () => {
     it('should generate invitation token for GM', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         body: {
           campaignId,
@@ -172,12 +173,12 @@ describe('Campaign API Contracts', () => {
       });
       const loginHandler = (await import('../../../pages/api/auth/login')).default;
       await loginHandler(loginReq, loginRes);
-      const playerCookie = loginRes._getHeaders()['set-cookie'][0].split(';')[0];
+      const playerSessionToken = extractSessionToken(loginRes._getHeaders()['set-cookie']);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: playerCookie,
+        cookies: {
+          session: playerSessionToken!,
         },
         body: {
           campaignId,
@@ -195,8 +196,8 @@ describe('Campaign API Contracts', () => {
     it('should reject invitation for non-existent campaign', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         body: {
           campaignId: 99999,
@@ -214,8 +215,8 @@ describe('Campaign API Contracts', () => {
     it('should return campaign details for GM', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'GET',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         query: {
           id: campaignId.toString(),
@@ -251,8 +252,8 @@ describe('Campaign API Contracts', () => {
     it('should return 404 for non-existent campaign', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'GET',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         query: {
           id: '99999',
@@ -270,8 +271,8 @@ describe('Campaign API Contracts', () => {
     it('should revoke invitation by GM', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'DELETE',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         query: {
           token: invitationToken,
@@ -287,8 +288,8 @@ describe('Campaign API Contracts', () => {
     it('should return 404 for non-existent invitation token', async () => {
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'DELETE',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         query: {
           token: 'invalid_token_123',
@@ -305,8 +306,8 @@ describe('Campaign API Contracts', () => {
       // Create new invitation first
       const { req: inviteReq, res: inviteRes } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'POST',
-        headers: {
-          cookie: gmSessionCookie,
+        cookies: {
+          session: gmSessionToken!,
         },
         body: {
           campaignId,
@@ -326,12 +327,12 @@ describe('Campaign API Contracts', () => {
       });
       const loginHandler = (await import('../../../pages/api/auth/login')).default;
       await loginHandler(loginReq, loginRes);
-      const playerCookie = loginRes._getHeaders()['set-cookie'][0].split(';')[0];
+      const playerSessionToken = extractSessionToken(loginRes._getHeaders()['set-cookie']);
 
       const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
         method: 'DELETE',
-        headers: {
-          cookie: playerCookie,
+        cookies: {
+          session: playerSessionToken!,
         },
         query: {
           token: newToken,

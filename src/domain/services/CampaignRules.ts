@@ -1,5 +1,6 @@
 import { Character, CharacterStatus } from '../entities/Character';
 import { CampaignRepository } from '../../infrastructure/database/repositories/CampaignRepository';
+import { PermissionError, NotFoundError } from '../../application/dto';
 
 /**
  * CampaignRules - Domain service for enforcing campaign business rules
@@ -41,11 +42,11 @@ export class CampaignRules {
     const campaign = await campaignRepo.findById(campaignId);
 
     if (!campaign) {
-      throw new Error('Campaign not found');
+      throw new NotFoundError('Campaign not found');
     }
 
     if (campaign.gmUserId !== userId) {
-      throw new Error('Only the Game Master can perform this action');
+      throw new PermissionError('Only the Game Master can perform this action');
     }
   }
 
